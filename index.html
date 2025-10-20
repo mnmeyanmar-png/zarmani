@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Meta tags, Title, Flutter script -->
+  <meta charset="UTF-8">
+  <title>Barcode Label Generator</title>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <script src="main.dart.js" defer></script>
+
+  <!-- 
+    ============================================================
+    IMPORTANT: SVG to PNG Conversion Library - MUST BE INCLUDED
+    ============================================================
+    You MUST include a library for SVG to Canvas conversion.
+    'canvg' is a popular choice. You can host it locally or use a CDN.
+
+    Option 1: Use CDN (Uncomment the line below)
+    This is the easiest way if you have internet access.
+    Make sure this line is uncommented.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/canvg/dist/browser/canvg.min.js"></script>
+
+  <!-- 
+    Option 2: Use a local file (Download canvg.min.js and place in web/ folder)
+    <script src="canvg.min.js"></script> 
+  -->
+
+  <!-- 
+    ============================================================
+    JavaScript functions for PNG download
+    ============================================================
+  -->
+  <script>
+    function downloadSvgAsPng(svgString, fileName) {
+      // Check if canvg is loaded. If not, log an error and inform the user.
+      if (typeof canvg === 'undefined') {
+        console.error("Canvg library is not loaded. Cannot convert SVG to PNG.");
+        // Optionally, inform the user via an alert or toast.
+        // alert("Error: Conversion library not loaded. Please check your index.html setup.");
+        return; // Stop execution if canvg is not available
+      }
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      try {
+        // Use canvg to render the SVG string onto the canvas.
+        canvg(canvas, svgString, { ignoreClear: true });
+
+        // Once canvg rendering is complete, convert the canvas content to a PNG data URL.
+        const pngUrl = canvas.toDataURL('image/png');
+
+        // Trigger the download of the PNG file using the helper function.
+        triggerDownload(pngUrl, fileName);
+
+      } catch (e) {
+        console.error("Error during SVG to PNG conversion:", e);
+        // alert("Failed to convert SVG to PNG."); // User feedback
+      }
+    }
+
+    // Helper function to create and click a download link.
+    function triggerDownload(dataUrl, fileName) {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      // Ensure the filename has a .png extension.
+      link.download = fileName.replace(/\.svg$/i, '.png'); // Safely replace .svg with .png
+      document.body.appendChild(link); // Append link to the body to make it clickable
+      link.click(); // Programmatically click the link
+      document.body.removeChild(link); // Clean up the link element after download trigger
+    }
+
+    // Make the main conversion function globally accessible so Dart can call it.
+    window.downloadSvgAsPng = downloadSvgAsPng;
+  </script>
+
+</head>
+<body>
+  <!-- The Flutter app will be mounted here -->
+</body>
+</html>
